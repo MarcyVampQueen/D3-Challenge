@@ -84,9 +84,29 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
      * Add text/titles/etc.
      */
     // =================================
+    // label the circles
+    // chartGroup.append("text")
+    //     .
+    // X axis title
     chartGroup.append("text")
-        .attr("dx", d => -20)
-        .text("hi");
+        .attr("transform", `translate(${width / 2}, ${height + margin.top + 10})`)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "16px")
+        .text("Poverty");
+
+    // Y axis title
+    chartGroup.append("text")
+        // this rotation makes things weird!
+        // x and y placements will seem transposed.
+        .attr("transform", "rotate(-90)")
+        .attr("x", 0 - height / 2)
+        .attr("y", 0 - margin.left)
+        // "em" used to offset the text. 1em is equivalent to 
+        // the font size. For example, if default text is 16px, then 1 em is 16, 
+        // 2 is 32px, etc. Used to dynamically place text regardless of size.
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Healthcare");
 
 
     /* Step 7:
