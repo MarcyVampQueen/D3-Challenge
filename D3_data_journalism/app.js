@@ -33,8 +33,6 @@ var chartGroup = svg.append("g")
  */
 // =================================
 d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
-    console.log(healthData);
-
     /* Step 3:
      * Prep the data - 
      * clean and/or filter
@@ -42,7 +40,7 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
     // =================================
     healthData.forEach(state => state.healthcare = +state.healthcare);
     healthData.forEach(state => state.poverty = +state.poverty);
-    console.log(healthData);
+    console.log(healthData.map(s => s.poverty));
 
     /* Step 4:
      * Scales and axes
@@ -50,40 +48,34 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
     // =================================
     // scales
     var xScale = d3.scaleLinear()
-        .domain([0, pizzasEatenByMonth.length])
+        .domain([0, d3.max(healthData.map(s => s.poverty))])
         .range([0, width]);
 
     var yScale = d3.scaleLinear()
-        .domain([0, d3.max(pizzasEatenByMonth)])
+        .domain([0, d3.max(healthData.map(s => s.healthcare))])
         .range([height, 0]);
 
-    // skip axes on this activity
+    var bottomAxis = d3.axisBottom(xScale);
+    var leftAxis = d3.axisLeft(yScale);
+    chartGroup.append("g")
+        .call(leftAxis);
+
+    chartGroup.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(bottomAxis);
 
 
     /* Step 5:
      * Draw the actual chart!
      */
     // =================================
-    // create path
-    // line generator
-    var lineGenerator = d3.line()
-        .x((d, i) => xScale(i))
-        .y(d => yScale(d));
-
-    chartGroup.append("path")
-        .attr("d", lineGenerator(pizzasEatenByMonth))
-        .attr("fill", "none")
-        .attr("stroke", "blue");
-
     // append circles to data points
-    // Note that I've saved these into a new variable - now I
-    // can reference these elements and their bound data when needed!
     var circlesGroup = chartGroup.selectAll("circle")
-        .data(pizzasEatenByMonth)
+        .data(healthData)
         .enter()
         .append("circle")
-        .attr("cx", (d, i) => xScale(i))
-        .attr("cy", d => yScale(d))
+        .attr("cx", d => xScale(d.poverty))
+        .attr("cy", d => yScale(d.healthcare))
         .attr("r", "5")
         .attr("fill", "red");
 
@@ -92,7 +84,9 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
      * Add text/titles/etc.
      */
     // =================================
-    // Skip for this activity
+    chartGroup.append("text")
+        .attr("dx", d => -20)
+        .text("hi");
 
 
     /* Step 7:
