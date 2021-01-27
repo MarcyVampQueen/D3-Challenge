@@ -4,8 +4,8 @@
 // =================================
 var svgArea = d3.select("body").select("svg");
 
-var svgWidth = window.innerWidth;
-var svgHeight = window.innerHeight;
+var svgWidth = window.innerWidth - 100;
+var svgHeight = window.innerHeight - 100;
 
 var margin = {
     top: 50,
@@ -40,19 +40,21 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
     // =================================
     healthData.forEach(state => state.healthcare = +state.healthcare);
     healthData.forEach(state => state.poverty = +state.poverty);
-    console.log(healthData.map(s => s.poverty));
+    console.log(healthData);
 
     /* Step 4:
      * Scales and axes
      */
     // =================================
     // scales
+    healthcare = healthData.map(s => s.healthcare);
+    poverty = healthData.map(s => s.poverty)
     var xScale = d3.scaleLinear()
-        .domain([0, d3.max(healthData.map(s => s.poverty))])
+        .domain([d3.min(poverty)-1, d3.max(poverty)])
         .range([0, width]);
 
     var yScale = d3.scaleLinear()
-        .domain([0, d3.max(healthData.map(s => s.healthcare))])
+        .domain([d3.min(healthcare)-1, d3.max(healthcare)])
         .range([height, 0]);
 
     var bottomAxis = d3.axisBottom(xScale);
@@ -70,29 +72,34 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
      */
     // =================================
     // append circles to data points
-    var circlesGroup = chartGroup.selectAll("circle")
-        .data(healthData)
-        .enter()
-        .append("circle")
+    var chartData = chartGroup.selectAll("circles")
+        .data(healthData);
+    var chartDataEnter = chartData.enter().append("g")
+    var circlesGroup = chartDataEnter.append("circle")
         .attr("cx", d => xScale(d.poverty))
         .attr("cy", d => yScale(d.healthcare))
-        .attr("r", "5")
-        .attr("fill", "red");
-
+        .attr("r", "10")
+        .attr("fill", "#B2F1DF");
 
     /* Step 6:
      * Add text/titles/etc.
      */
     // =================================
     // label the circles
-    // chartGroup.append("text")
-    //     .
+    chartDataEnter.append("text")
+        .attr("dx", d => xScale(d.poverty))
+        .attr("dy", d => yScale(d.healthcare))
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("font-size", "10px")
+        .text(d => d.abbr);
     // X axis title
     chartGroup.append("text")
-        .attr("transform", `translate(${width / 2}, ${height + margin.top + 10})`)
+        .attr("transform", `translate(${width / 2}, ${height + margin.top})`)
         .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "after-edge")
         .attr("font-size", "16px")
-        .text("Poverty");
+        .text("In Poverty (%)");
 
     // Y axis title
     chartGroup.append("text")
@@ -106,7 +113,7 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
         // 2 is 32px, etc. Used to dynamically place text regardless of size.
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Healthcare");
+        .text("Lacks Healthcare (%)");
 
 
     /* Step 7:
