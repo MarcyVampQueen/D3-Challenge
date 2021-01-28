@@ -50,11 +50,11 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
     healthcare = healthData.map(s => s.healthcare);
     poverty = healthData.map(s => s.poverty)
     var xScale = d3.scaleLinear()
-        .domain([d3.min(poverty)-1, d3.max(poverty)])
+        .domain([d3.min(poverty) - 1, d3.max(poverty)])
         .range([0, width]);
 
     var yScale = d3.scaleLinear()
-        .domain([d3.min(healthcare)-1, d3.max(healthcare)])
+        .domain([d3.min(healthcare) - 1, d3.max(healthcare)])
         .range([height, 0]);
 
     var bottomAxis = d3.axisBottom(xScale);
@@ -123,33 +123,25 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
 
     // part a: append a div to the body. This is empty at time
     // of creation.
-    var toolTip = d3.select("body")
-        .append("div")
-        .attr("class", "tooltip");
+    // Step 1: Initialize Tooltip
+    var toolTip = d3.tip()
+        .attr("class", "tooltip")
+        .offset([80, -60])
+        .html(function (d) {
+            return (`<strong>% In Poverty: ${d.poverty}<strong><hr>% Without Healthcare: ${d.healthcare}`);
+        });
 
-    // part b: create handlers
-    function onMouseover(d, i) {
-        toolTip.style("display", "block");
-        toolTip.html(`Pizzas eaten: <strong>${pizzasEatenByMonth[i]}</strong>`)
-            .style("left", d3.event.pageX + "px")
-            .style("top", d3.event.pageY + "px");
-    }
+    // Step 2: Create the tooltip in chartGroup.
+    chartGroup.call(toolTip);
 
-    function onMouseout(d, i) {
-        toolTip.style("display", "none");
-    }
-
-    // part c: add event listener
-    circlesGroup.on("mouseover", onMouseover).on("mouseout", onMouseout);
-
-
-    //You can put multiple functionality on a single element!
-    function onClick(d, i) {
-        alert(`Hey! I already told you, ${pizzasEatenByMonth[i]} pizzas!`)
-    }
-    circlesGroup.on("mouseover", onMouseover)
-        .on("mouseout", onMouseout)
-        .on("click", onClick);
+    // Step 3: Create "mouseover" event listener to display tooltip
+    circlesGroup.on("mouseover", function (d) {
+        toolTip.show(d, this);
+    })
+        // Step 4: Create "mouseout" event listener to hide tooltip
+        .on("mouseout", function (d) {
+            toolTip.hide(d);
+        });
 }
     , function (error) {
         console.log(error);
