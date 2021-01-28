@@ -28,8 +28,7 @@ var chartGroup = svg.append("g")
 
 
 /* Step 2
- * Access the data from somewhere and pull it into 
- * your program
+ * Access the data and pull it in
  */
 // =================================
 d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
@@ -46,7 +45,6 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
      * Scales and axes
      */
     // =================================
-    // scales
     healthcare = healthData.map(s => s.healthcare);
     poverty = healthData.map(s => s.poverty)
     var xScale = d3.scaleLinear()
@@ -103,14 +101,9 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
 
     // Y axis title
     chartGroup.append("text")
-        // this rotation makes things weird!
-        // x and y placements will seem transposed.
         .attr("transform", "rotate(-90)")
         .attr("x", 0 - height / 2)
         .attr("y", 0 - margin.left)
-        // "em" used to offset the text. 1em is equivalent to 
-        // the font size. For example, if default text is 16px, then 1 em is 16, 
-        // 2 is 32px, etc. Used to dynamically place text regardless of size.
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Lacks Healthcare (%)");
@@ -120,9 +113,6 @@ d3.csv("D3_data_journalism/data.csv").then(function (healthData) {
      * Add the interactivity!
      */
     // =======================================================
-
-    // part a: append a div to the body. This is empty at time
-    // of creation.
     // Step 1: Initialize Tooltip
     var toolTip = d3.tip()
         .attr("class", "tooltip")
